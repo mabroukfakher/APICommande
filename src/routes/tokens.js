@@ -15,7 +15,6 @@ class SecurityTokensRoute {
       this.getTokens.bind(this)
     );
 
-
     this.router.post(
       "/v1/security/tokens",
       security.checkUserScope.bind(this, security.scope.CHEF),
