@@ -86,7 +86,7 @@ class SecurityTokensRoute {
   async deleteToken(req, res, next) {
     try {
       const data = await SecurityTokensService.deleteToken(req.params.id);
-      return res.end();
+      return res.end(data);
     } catch (err) {
       return next(err);
     }
