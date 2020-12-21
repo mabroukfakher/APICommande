@@ -1,20 +1,15 @@
 import { ObjectID } from "mongodb";
 import jwt from "jsonwebtoken";
-import lruCache from "lru-cache";
 import { db } from "../../lib/mongo";
 import parse from "../../lib/parse";
 import settings from "../../lib/settings";
 
-const cache = lruCache({
-  max: 10000,
-  maxAge: 1000 * 60 * 60 * 24 // 24h
-});
 
-const BLACKLIST_CACHE_KEY = "blacklist";
+
 
 class SecurityTokensService {
   getTokens(params = {}) {
-
+    const filter = {};
 
     const id = parse.getObjectIDIfValid(params.id);
     if (id) {
@@ -86,19 +81,9 @@ class SecurityTokensService {
     const tokenObjectID = new ObjectID(id);
     return db
       .collection("tokens")
-      .updateOne(
-        {
-          _id: tokenObjectID
-        },
-        {
-          $set: {
-            date_created: new Date()
-          }
-        }
-      )
-      .then(res => {
-        cache.del(BLACKLIST_CACHE_KEY);
-      });
+      .deleteOne({ _id: tokenObjectID })
+      .then(deleteResponse => deleteResponse.deletedCount > 0);
+  
   }
 
   checkTokenMatriculeUnique(matricule) {

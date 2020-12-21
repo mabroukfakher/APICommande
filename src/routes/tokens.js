@@ -11,37 +11,32 @@ class SecurityTokensRoute {
 
     this.router.get(
       "/v1/security/tokens",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
+      security.checkUserScope.bind(this, security.scope.CHEF),
       this.getTokens.bind(this)
     );
 
-    this.router.get(
-      "/v1/security/tokens/blacklist",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
-      this.getTokensBlacklist.bind(this)
-    );
-  
+
     this.router.post(
       "/v1/security/tokens",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
+      security.checkUserScope.bind(this, security.scope.CHEF),
       this.addToken.bind(this)
     );
 
     this.router.get(
       "/v1/security/tokens/:id",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
+      security.checkUserScope.bind(this, security.scope.CHEF),
       this.getSingleToken.bind(this)
     );
   
     this.router.put(
       "/v1/security/tokens/:id",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
+      security.checkUserScope.bind(this, security.scope.CHEF),
       this.updateToken.bind(this)
     );
 
     this.router.delete(
       "/v1/security/tokens/:id",
-      security.checkUserScope.bind(this, security.scope.ADMIN),
+      security.checkUserScope.bind(this, security.scope.CHEF),
       this.deleteToken.bind(this)
     );
    
@@ -58,14 +53,6 @@ class SecurityTokensRoute {
     }
   }
 
-  async getTokensBlacklist(req, res, next) {
-    try {
-      const data = await SecurityTokensService.getTokensBlacklist();
-      return res.send(data);
-    } catch (err) {
-      return next(err);
-    }
-  }
 
   async getSingleToken(req, res, next) {
     try {
