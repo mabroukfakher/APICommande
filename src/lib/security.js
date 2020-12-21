@@ -9,7 +9,7 @@ const SET_TOKEN_AS_REVOKEN_ON_EXCEPTION = true;
 const PATHS_WITH_OPEN_ACCESS = ["/api/v1/authorize", /\/ajax\//i];
 
 const scope = {
-  ADMIN: "admin",
+  CHEF: "chef",
   PREPARATION: "preparation",
   Insertion: "insertion"
 };
