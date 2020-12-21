@@ -25,6 +25,23 @@ const addTokens = async db => {
   });
 };
 
+const addRoles = async db => {
+  await db.collection("roles").insertOne({
+    date_created: new Date(),
+    name: "Chef",
+    scopes: ["Chef"]
+  });
+  await db.collection("roles").insertOne({
+    date_created: new Date(),
+    name: "Préparation",
+    scopes: ["preparation"]
+  });
+  await db.collection("roles").insertOne({
+    date_created: new Date(),
+    name: "Insertion",
+    scopes: ["insertion"]
+  });
+};
 
 (async () => {
   let client = null;
@@ -40,6 +57,7 @@ const addTokens = async db => {
   }
 
   await addTokens(db);
+  await addRoles(db);
 
   client.close();
 })();

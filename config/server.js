@@ -11,10 +11,6 @@ const dbUrl =
   process.env.DB_URL || `mongodb://${dbCred}${dbHost}:${dbPort}/${dbName}`;
 module.exports = {
 
-
-  // Access-Control-Allow-Origin
-  clientBaseUrl: `http://localhost:3000`,
-
   // used by API
   adminBaseURL: "http://localhost:3002",
 

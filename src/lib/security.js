@@ -10,6 +10,8 @@ const PATHS_WITH_OPEN_ACCESS = ["/api/v1/authorize", /\/ajax\//i];
 
 const scope = {
   ADMIN: "admin",
+  PREPARATION: "preparation",
+  Insertion: "insertion"
 };
 
 const checkUserScope = (requiredScope, req, res, next) => {
@@ -81,7 +83,7 @@ const applyMiddleware = app => {
 };
 
 const getAccessControlAllowOrigin = () =>
-  [settings.clientBaseUrl, settings.adminBaseURL] || "*";
+  [settings.adminBaseURL] || "*";
 
 export default {
   checkUserScope,
