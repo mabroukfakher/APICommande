@@ -17,9 +17,8 @@ const addTokens = async db => {
     is_revoked: false,
     date_created: new Date(),
     name: "admin",
-    scopes: ["admin"],
-    expiration: 8760,
-    email: "admin@rihab.com",
+    scopes: ["chef"],
+    matricule: "TopAdmin",
     date_updated: null,
     password: "admin"
   });

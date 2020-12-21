@@ -60,23 +60,11 @@ const checkUserToken = (req, res, next) => {
 };
 
 
-const checkTokenInBlacklistCallback = async (req, payload, done) => {
-  try {
-    const { jti } = payload;
-    const blacklist = await SecurityTokensService.getTokensBlacklist();
-    const tokenIsRevoked = blacklist.includes(jti);
-    return done(null, tokenIsRevoked);
-  } catch (e) {
-    done(e, SET_TOKEN_AS_REVOKEN_ON_EXCEPTION);
-  }
-};
-
 const applyMiddleware = app => {
   if (DEVELOPER_MODE === false) {
     app.use(
       expressJwt({
         secret: settings.jwtSecretKey,
-        isRevoked: checkTokenInBlacklistCallback
       }).unless({ path: PATHS_WITH_OPEN_ACCESS })
     );
   }
