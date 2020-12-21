@@ -70,7 +70,7 @@ const applyMiddleware = app => {
 };
 
 const getAccessControlAllowOrigin = () =>
-  [settings.adminBaseURL] || "*";
+  [settings.BaseURL] || "*";
 
 export default {
   checkUserScope,
