@@ -4,9 +4,8 @@ import SecurityTokensService from "../services/security/tokens";
 import AuthHeader from "./auth-header";
 
 const DEVELOPER_MODE = settings.developerMode === true;
-const SET_TOKEN_AS_REVOKEN_ON_EXCEPTION = true;
 
-const PATHS_WITH_OPEN_ACCESS = ["/api/v1/authorize", /\/ajax\//i];
+const PATHS_WITH_OPEN_ACCESS = ["/api/v1/authorize"];
 
 const scope = {
   CHEF: "chef",
