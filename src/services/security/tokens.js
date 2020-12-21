@@ -168,7 +168,7 @@ class SecurityTokensService {
   }
 
   getDashboardSignin(matricule, password) {
-    return this.VerifMAtriculegetSingleToken(matricule, password).then(token => {
+    return this.VerifMatriculegetSingleToken(matricule, password).then(token => {
       if (token) {
         return this.getSignedToken(token).then(signedToken => {
           return signedToken;

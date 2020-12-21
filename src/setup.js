@@ -14,7 +14,6 @@ const CONNECT_OPTIONS = {
 
 const addTokens = async db => {
   await db.collection("tokens").insertOne({
-    is_revoked: false,
     date_created: new Date(),
     name: "admin",
     role: ["chef"],
