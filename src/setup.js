@@ -17,7 +17,7 @@ const addTokens = async db => {
     is_revoked: false,
     date_created: new Date(),
     name: "admin",
-    scopes: ["chef"],
+    role: ["chef"],
     matricule: "TopAdmin",
     date_updated: null,
     password: "admin"
@@ -28,17 +28,17 @@ const addRoles = async db => {
   await db.collection("roles").insertOne({
     date_created: new Date(),
     name: "Chef",
-    scopes: ["Chef"]
+    role: ["Chef"]
   });
   await db.collection("roles").insertOne({
     date_created: new Date(),
     name: "Préparation",
-    scopes: ["preparation"]
+    role: ["preparation"]
   });
   await db.collection("roles").insertOne({
     date_created: new Date(),
     name: "Insertion",
-    scopes: ["insertion"]
+    role: ["insertion"]
   });
 };
 

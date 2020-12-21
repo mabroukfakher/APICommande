@@ -109,7 +109,7 @@ class SecurityTokensService {
       if (matricule && matricule.length > 0) {
         token.matricule = matricule;
       }
-      token.scopes = parse.getArrayIfValid(data.scopes);
+      token.role = parse.getArrayIfValid(data.role);
       token.password = parse.getString(data.password);
       return token;
     });
@@ -148,7 +148,7 @@ class SecurityTokensService {
     return new Promise((resolve, reject) => {
 
       const payload = {
-        scopes: token.scopes,
+        role: token.role,
         jti: token.id
       };
 

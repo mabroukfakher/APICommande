@@ -10,7 +10,7 @@ class RolesRoute {
   registerRoutes() {
 
     this.router.get(
-      "/v1/security/tokens",
+      "/v1/roles",
       security.checkUserScope.bind(this, security.scope.CHEF),
       this.getTokens.bind(this)
     );

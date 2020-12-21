@@ -21,10 +21,10 @@ const checkUserScope = (requiredScope, req, res, next) => {
 
     if (
     user &&
-    user.scopes &&
-    user.scopes.length > 0 &&
-    (user.scopes.includes(scope.CHEF) ||
-      user.scopes.includes(requiredScope))
+    user.role &&
+    user.role.length > 0 &&
+    (user.role.includes(scope.CHEF) ||
+      user.role.includes(requiredScope))
     ) {
       next();
     } else {
