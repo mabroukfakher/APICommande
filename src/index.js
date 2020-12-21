@@ -7,8 +7,7 @@ import winston from "winston";
 import logger from "./lib/logger";
 import settings from "./lib/settings";
 import security from "./lib/security";
-import cltRouter from "./CltRouter";
-import dashRouter from "./DashRouter";
+import Router from "./router";
 
 
 const app = express();
@@ -52,8 +51,8 @@ app.use(cookieParser(settings.cookieSecretKey));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use("/ajax", cltRouter);
-app.use("/api", dashRouter);
+
+app.use("/api", Router);
 
 
 
