@@ -24,7 +24,7 @@ const checkUserScope = (requiredScope, req, res, next) => {
     user &&
     user.scopes &&
     user.scopes.length > 0 &&
-    (user.scopes.includes(scope.ADMIN) ||
+    (user.scopes.includes(scope.CHEF) ||
       user.scopes.includes(requiredScope))
     ) {
       next();

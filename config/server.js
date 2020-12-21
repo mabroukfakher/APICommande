@@ -12,7 +12,7 @@ const dbUrl =
 module.exports = {
 
   // used by API
-  adminBaseURL: "http://localhost:3002",
+  BaseURL: "http://localhost:3002",
 
   apiListenPort: 3001,
   
