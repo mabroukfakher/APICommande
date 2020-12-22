@@ -139,13 +139,9 @@ class LocalService {
 		fse.ensureDirSync(uploadDir);
 
 		const form = new formidable.IncomingForm();
-		// form.parse(req, function(err, fields, files) {
-		// 	console.log(files);
-		// 	console.log(fields);
-		// });
+
 		form.uploadDir = uploadDir;
-		console.log(form);
-		console.log(form.file);
+
 		form
 			.on('fileBegin', (name, file) => {
 				// Emitted whenever a field / value pair has been received.
@@ -154,6 +150,7 @@ class LocalService {
 			})
 			.on('file', async (field, file) => {
 				// every time a file has been uploaded successfully,
+				console.log("file",file)
 				if (file.name) {
 					await onFileUpload(file.name);
 

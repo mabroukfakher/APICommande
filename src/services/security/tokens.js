@@ -117,7 +117,7 @@ class SecurityTokensService {
 
   getValidDocumentForUpdate(id, data) {
     if (Object.keys(data).length === 0) {
-      return new Error("Required fields are missing");
+      return {status:false,message:"Required fields are missing"};
     }
 
     const token = {

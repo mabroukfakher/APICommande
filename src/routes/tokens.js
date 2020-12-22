@@ -83,13 +83,11 @@ class SecurityTokensRoute {
     }
   }
 
-  async deleteToken(req, res, next) {
-    try {
-      const data = await SecurityTokensService.deleteToken(req.params.id);
-      return res.end(data);
-    } catch (err) {
-      return next(err);
-    }
+  deleteToken(req, res, next) {
+    SecurityTokensService.deleteToken(req.params.id).then(data => {
+			res.status(data ? 200 : 404).end();
+		});
+    
   }
 
   async DashboardSignin(req, res, next) {
