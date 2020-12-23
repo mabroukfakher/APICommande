@@ -70,11 +70,11 @@ class InsertionService {
                 res.send({ status: false, message: "shema && image empty"});
             }
 
-            if(files.shema.size == 0){
+            if(files.shema&&files.shema.size == 0){
                 res.send({ status: false, message: "shema empty"});
             }
 
-            if(files.image.size == 0){
+            if(files.shema&&files.shema.size == 0){
                 res.send({ status: false, message: "image empty"});
             }
 
@@ -123,7 +123,7 @@ class InsertionService {
 
             const data = await this.getcomposants(commandeId)
 
-            res.send({fakher:data});
+            res.send({status: true,data:data});
        
          });
         
