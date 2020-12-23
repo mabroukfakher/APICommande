@@ -11,7 +11,8 @@ class InsertionService {
 
     async getcomposants(commandeId) {
 		if (!ObjectID.isValid(commandeId)) {
-			return Promise.reject('Invalid identifier');
+            return {status:false,message:"Invalid identifier"}
+
 		}
 		let commandeObjectID = new ObjectID(commandeId);
         const assetsDomain = settings.assetServer.domain;
@@ -131,7 +132,7 @@ class InsertionService {
 
     deletecomposant(commandeId, composantId) {
 		if (!ObjectID.isValid(commandeId) || !ObjectID.isValid(composantId)) {
-			return Promise.reject('Invalid identifier');
+			return {status:false,message:"Invalid identifier"}
 		}
 		let commandeObjectID = new ObjectID(commandeId);
 		let composantObjectID = new ObjectID(composantId);

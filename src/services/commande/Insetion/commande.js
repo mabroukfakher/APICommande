@@ -231,7 +231,7 @@ class CommandeService {
     
     deleteCommande(commandeId) {
 		if (!ObjectID.isValid(commandeId)) {
-			return Promise.reject('Invalid identifier');
+			return {status:false,message:"Invalid identifier"}
 		}
 		const commandeObjectID = new ObjectID(commandeId);
 		const domain = settings.assetServer.domain;
