@@ -137,7 +137,7 @@ class InsertionService {
 		let composantObjectID = new ObjectID(composantId);
 
 		return this.getcomposants(commandeId)
-			.then(composants => {
+			.then(async composants => {
 				if (composants && composants.length > 0) {
 					let composantData = composants.find(
 						i => i.id.toString() === composantId.toString()
@@ -159,12 +159,13 @@ class InsertionService {
                         );
                         fse.removeSync(image_path);
                         
-						return db
+						 db
 							.collection('commandeInsetion')
 							.updateOne(
 								{ _id: commandeObjectID },
 								{ $pull: { composants: { id: composantObjectID } } }
-							);
+                            );
+                        return await this.getcomposants(commandeId)
 					} else {
 						return {status: false};
 					}

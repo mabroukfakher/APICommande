@@ -103,7 +103,7 @@ class CommandesRoute {
 	deleteCommande(req, res, next) {
 		CommandeService.deleteCommande(req.params.commandeId)
 			.then(data => {
-				res.status(data ? 200 : 404).end();
+				res.send(data);
 			})
 			.catch(next);
 	}
@@ -126,7 +126,7 @@ class CommandesRoute {
 			req.params.commandeId,
 			req.params.composantId
 		).then(data => {
-			res.status(data ? 200 : 404).end();
+			res.send(data);
 		});
 	}
 
