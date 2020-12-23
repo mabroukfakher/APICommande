@@ -31,7 +31,7 @@ class SecurityTokensService {
 
   getSingleToken(id) {
     if (!ObjectID.isValid(id)) {
-      return Promise.reject("Invalid identifier");
+      return {status:false,message:"Invalid identifier"}
     }
     return this.getTokens({ id }).then(items =>
       items.length > 0 ? items[0] : null
@@ -46,19 +46,32 @@ class SecurityTokensService {
 
   addToken(data) {
     return this.getValidDocumentForInsert(data)
-      .then(tokenData => db.collection("tokens").insertMany([tokenData]))
-      .then(res => this.getSingleToken(res.ops[0]._id.toString()))
-      .then(token =>
-        this.getSignedToken(token).then(signedToken => {
+      .then(tokenData => {
+        if(tokenData.status===true)
+        return db.collection("tokens").insertMany([tokenData.token])
+        return tokenData
+        })
+      .then(res =>{
+        
+        if(res.status===false)
+        return res
+        return this.getSingleToken(res.ops[0]._id.toString())
+        })
+      .then(token =>{
+        if(token.status===false)
+        return token
+        
+        return this.getSignedToken(token).then(signedToken => {
           token.token = signedToken;
           return token;
         })
-      );
+      });
   }
 
   updateToken(id, data) {
     if (!ObjectID.isValid(id)) {
-      return Promise.reject("Invalid identifier");
+      return {status:false,message:"Invalid identifier"}
+
     }
     const tokenObjectID = new ObjectID(id);
     const token = this.getValidDocumentForUpdate(id, data);
@@ -76,7 +89,7 @@ class SecurityTokensService {
 
   deleteToken(id) {
     if (!ObjectID.isValid(id)) {
-      return Promise.reject("Invalid identifier");
+      return {status:false,message:"Invalid identifier"}
     }
     const tokenObjectID = new ObjectID(id);
     return db
@@ -86,32 +99,41 @@ class SecurityTokensService {
   
   }
 
-  checkTokenMatriculeUnique(matricule) {
+  async checkTokenMatriculeUnique(matricule) {
     if (matricule && matricule.length > 0) {
       return db
         .collection("tokens")
         .countDocuments({ matricule })
-        .then(count =>
-          count === 0 ? matricule : Promise.reject("Token matricule must be unique")
-        );
+        .then(count =>{
+          if(count === 0) {
+            return {status:true, matricule:matricule}  
+          } 
+          return {status:false,message:"Token matricule must be unique"}
+         
+        });
     }
-    return Promise.resolve(matricule);
+
+    return {status:false,message:"matricule empty"};
   }
 
   getValidDocumentForInsert(data) {
     const matricule = parse.getString(data.matricule);
     return this.checkTokenMatriculeUnique(matricule).then(matricule => {
-      const token = {
-        date_created: new Date()
-      };
+      if(matricule.status)
+      { 
+          const token = {
+            date_created: new Date()
+          };
 
-      token.name = parse.getString(data.name);
-      if (matricule && matricule.length > 0) {
-        token.matricule = matricule;
+          token.name = parse.getString(data.name);
+          if (matricule && matricule.matricule&& matricule.matricule.length > 0) {
+            token.matricule = matricule.matricule;
+          }
+          token.role = parse.getArrayIfValid(data.role);
+          token.password = parse.getString(data.password);
+          return {status:true,token:token}; 
       }
-      token.role = parse.getArrayIfValid(data.role);
-      token.password = parse.getString(data.password);
-      return token;
+      return matricule
     });
   }
 
@@ -182,7 +204,7 @@ class SecurityTokensService {
     const { matricule, password } = req.body;
     const token = await this.getDashboardSignin(matricule, password);
     if (token) {
-      return { status: true, data: { token: token } };
+      return { status: true, data: { token: token } , message: "Access Success"};
     }
     return { status: false, message: "Access Denied" };
   }
