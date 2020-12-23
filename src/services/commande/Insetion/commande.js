@@ -88,7 +88,7 @@ class CommandeService {
 				item.id = item.id.toString();
 			}
 
-			item.composants = this.getSortedImagesWithUrls(item, domain);
+			item.composants = this.getSortedComposantsWithUrls(item, domain);
 
 		}
 
@@ -131,7 +131,7 @@ class CommandeService {
 		);
     }
     
-	getValidDocumentForInsert(data) {
+	async getValidDocumentForInsert(data) {
 
 		let commande = {
 			date_created: new Date(),
@@ -145,7 +145,7 @@ class CommandeService {
 		commande.codeClient = parse.getString(data.codeClient);
 		commande.quantite = parse.getNumberIfPositive(data.quantite) || 0;
 		commande.composant = parse.getString(data.composant) ;
-		commande.codeClientProduit = this.getString(data.codeClientProduit);
+		commande.codeClientProduit = parse.getString(data.codeClientProduit);
         commande.dateDebut = parse.getDateIfValid(data.dateDebut);
         commande.post = parse.getString(data.post);
 
@@ -191,7 +191,7 @@ class CommandeService {
         }
         
         if (data.codeClientProduit !== undefined) {
-            commande.codeClientProduit = this.getString(data.codeClientProduit);
+            commande.codeClientProduit = parse.getString(data.codeClientProduit);
         }
 
         if (data.dateDebut !== undefined) {
