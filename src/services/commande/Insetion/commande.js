@@ -7,6 +7,16 @@ import fse from 'fs-extra';
 import path from 'path';
 import utils from '../../../lib/utils';
 
+const ResolveSystemPath = (dir, file = "") => {
+	const BaseAssetPath = `${settings.assetServer.localBasePath}`;
+  
+	const paths = [BaseAssetPath, dir, file].filter(
+	  x => typeof x === "string" && x.length > 0
+	);
+  
+	return path.resolve(paths.join("/"));
+};
+
 class CommandeService {
 
 	getFilter(params = {}) {
@@ -224,6 +234,8 @@ class CommandeService {
 			return Promise.reject('Invalid identifier');
 		}
 		const commandeObjectID = new ObjectID(commandeId);
+		const domain = settings.assetServer.domain;
+
 		// 1. delete Commande
 		return db
 			.collection('commandeInsetion')
@@ -231,10 +243,9 @@ class CommandeService {
 			.then(deleteResponse => {
 				if (deleteResponse.deletedCount > 0) {
 					// 2. delete directory with composants
-					let deleteDir = path.resolve(
-						settings.assetServer.composantUploadPath + '/' + commandeId
-					);
-					fse.remove(deleteDir, err => {});
+					let deleteDir = settings.assetServer.composantUploadPath + '/' + commandeId
+					const dirPath = ResolveSystemPath(deleteDir);
+					fse.remove(dirPath);
 				}
 				return deleteResponse.deletedCount > 0;
 			});

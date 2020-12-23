@@ -150,14 +150,14 @@ class InsertionService {
                             assetsDomain,
 							settings.assetServer.composantUploadPath + '/' + commandeId + '/' + shema_name
                         );
-                        fse.removeSync(shema_path);
+                        //fse.removeSync(shema_path);
 
                         let image_name = composantData.image;
 						let image_path = url.resolve(
                             assetsDomain,
 							settings.assetServer.composantUploadPath + '/' + commandeId + '/' + image_name
                         );
-                        fse.removeSync(image_path);
+                        //fse.removeSync(image_path);
                         
 						 db
 							.collection('commandeInsetion')
