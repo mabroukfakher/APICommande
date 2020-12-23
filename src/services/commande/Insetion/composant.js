@@ -9,17 +9,17 @@ import utils from '../../../lib/utils';
 
 class InsertionService {
 
-    getcomposants(commandeId) {
+    async getcomposants(commandeId) {
 		if (!ObjectID.isValid(commandeId)) {
 			return Promise.reject('Invalid identifier');
 		}
 		let commandeObjectID = new ObjectID(commandeId);
         const assetsDomain = settings.assetServer.domain;
-		db
+		return db
 			.collection('commandeInsetion')
-			.findOne({ _id: commandeObjectID }, { fields: { composants: 1 } })
+			.findOne({ _id: commandeObjectID })
 			.then(commande => {
-				if (commande && commande.composants && product.composants.length > 0) {
+				if (commande && commande.composants && commande.composants.length > 0) {
 					let composants = commande.composants.map(composant => {
 						composant.shema = url.resolve(
 							assetsDomain,
@@ -94,18 +94,20 @@ class InsertionService {
                 var shema_path = `${uploadDir}/${shema_name}`;
 
             //upload files
-            fse.writeFile(image_path, function(err){ 
+            fse.writeFile(image_path,image_path, function(err){ 
+                if(err)
                 res.send({ status: false, message: "upload error"});
             }) 
 
-            fse.writeFile(shema_path, function(err){ 
+            fse.writeFile(shema_path,shema_path, function(err){ 
+                if(err)
                 res.send({ status: false, message: "upload error"});
             }) 
 
             //add BDD    
             const composantData = {
                 id: new ObjectID(),
-                schema:shema_name,
+                shema:shema_name,
                 image :image_name
             };
 
@@ -119,9 +121,11 @@ class InsertionService {
                 }
             );
 
-            return await this.getcomposants(commandeId)
+            const data = await this.getcomposants(commandeId)
+
+            res.send({fakher:data});
        
-        });
+         });
         
     }
 
@@ -139,16 +143,22 @@ class InsertionService {
 						i => i.id.toString() === composantId.toString()
 					);
 					if (composantData) {
+                        const assetsDomain = settings.assetServer.domain;
+
 						let shema_name = composantData.shema;
-						let shema_path = path.resolve(
+						let shema_path = url.resolve(
+                            assetsDomain,
 							settings.assetServer.composantUploadPath + '/' + commandeId + '/' + shema_name
-						);
+                        );
                         fse.removeSync(shema_path);
+
                         let image_name = composantData.image;
-						let image_path = path.resolve(
+						let image_path = url.resolve(
+                            assetsDomain,
 							settings.assetServer.composantUploadPath + '/' + commandeId + '/' + image_name
-						);
-						fse.removeSync(image_path);
+                        );
+                        fse.removeSync(image_path);
+                        
 						return db
 							.collection('commandeInsetion')
 							.updateOne(

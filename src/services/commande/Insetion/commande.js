@@ -84,10 +84,9 @@ class CommandeService {
     
     changeProperties(item, domain) {
 		if (item) {
-			if (item.id) {
-				item.id = item.id.toString();
-			}
-
+			item.id = item._id.toString();
+			delete item._id
+			
 			item.composants = this.getSortedComposantsWithUrls(item, domain);
 
 		}
@@ -160,7 +159,7 @@ class CommandeService {
 			.then(res => this.getSingleCommande(res.ops[0]._id.toString()));
 	}
 
-	getValidDocumentForUpdate(data) {
+	async getValidDocumentForUpdate(data) {
 
 		if (Object.keys(data).length === 0) {
             return {status:false,message:"Required fields are missing"};
@@ -217,7 +216,7 @@ class CommandeService {
 					.collection('commandeInsetion')
 					.updateOne({ _id: commandeObjectID }, { $set: dataToSet })
 			)
-			.then(res => (res.modifiedCount > 0 ? this.commandeObjectID(id) : null));
+			.then(res => (res.modifiedCount > 0 ? this.getSingleCommande(id) : null));
     }
     
     deleteCommande(commandeId) {
