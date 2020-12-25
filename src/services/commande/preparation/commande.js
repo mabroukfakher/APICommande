@@ -135,7 +135,7 @@ class CommandeService {
 		if (!ObjectID.isValid(id)) {
             return {status:false,message:"Invalid identifier"};
 		}
-		return this.getCommandes({ id: id, limit: 1 }).then(
+		return this.getCommandes({ ids: id, limit: 1 }).then(
 			commandes => (commandes.data.length > 0 ? commandes.data[0] : {})
 		);
     }
@@ -166,15 +166,7 @@ class CommandeService {
 			.then(dataToInsert =>
 				db.collection('commandeInsetion').insertMany([dataToInsert])
 			)
-			.then(async res =>{ 
-				if(res.insertedCount > 0) 
-				{
-					const commande =await this.getSingleCommande(res.ops[0]._id.toString())
-					return {status:true, data : commande, message :'Vous avez crée une nouvelle commande. Continuez les procédures'}
-				}
-				return {status:false, data : null, message :'ADD failed'}
-
-			});
+			.then(res => this.getSingleCommande(res.ops[0]._id.toString()));
 	}
 
 	async getValidDocumentForUpdate(data) {
@@ -234,16 +226,7 @@ class CommandeService {
 					.collection('commandeInsetion')
 					.updateOne({ _id: commandeObjectID }, { $set: dataToSet })
 			)
-			.then(async res =>{ 
-				if(res.modifiedCount > 0) 
-				{
-					const commande =await this.getSingleCommande(id)
-				 	return {status:true, data :commande, message :'update succes'}
-				}
-
-				return {status:false, data : null, message :'update failed'}
-
-			});
+			.then(res => (res.modifiedCount > 0 ? this.getSingleCommande(id) : null));
     }
     
     deleteCommande(commandeId) {
