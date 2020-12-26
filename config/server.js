@@ -27,6 +27,8 @@ module.exports = {
     filesUploadPath: "assets",
     themeImageUploadPath: "assets/images",
     composantUploadPath: "images/composant",
+    commandePreparationUploadPath: "images/commandePreparation",
+
   },
 
   // key to sign tokens

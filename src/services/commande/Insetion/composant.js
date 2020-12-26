@@ -126,7 +126,7 @@ class InsertionService {
 
             res.send({status: true,data:data});
        
-         });
+        });
         
     }
 

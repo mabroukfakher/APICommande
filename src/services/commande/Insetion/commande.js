@@ -129,7 +129,6 @@ class CommandeService {
         return composant;
 
 	}
-
     
     getSingleCommande(id) {
 		if (!ObjectID.isValid(id)) {

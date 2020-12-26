@@ -6,16 +6,7 @@ import parse from "../../../lib/parse";
 import fse from 'fs-extra';
 import path from 'path';
 import utils from '../../../lib/utils';
-
-const ResolveSystemPath = (dir, file = "") => {
-	const BaseAssetPath = `${settings.assetServer.localBasePath}`;
-  
-	const paths = [BaseAssetPath, dir, file].filter(
-	  x => typeof x === "string" && x.length > 0
-	);
-  
-	return path.resolve(paths.join("/"));
-};
+import formidable from 'formidable';
 
 class CommandeService {
 
@@ -33,33 +24,6 @@ class CommandeService {
             filter.ordreFabrication = ordreFabrication;
         }
 
-        const post = parse.getString(params.post);
-        if (post != "") {
-            filter.post = post;
-        }
-
-        const codeClientProduit = parse.getString(params.codeClientProduit);
-        if (codeClientProduit != "") {
-            filter.codeClientProduit = codeClientProduit;
-        }
-
-        const codeClient = parse.getString(params.codeClient);
-        if (codeClient != "") {
-            filter.codeClient = codeClient;
-        }
-
-		const search = parse.getString(params.search);
-		if (search != "") {
-			filter['$or'] = [
-				{ ordreFabrication: new RegExp(params.search, 'i') },
-                { post: new RegExp(params.search, 'i') },
-                { codeClientProduit: new RegExp(params.search, 'i') },
-                { composant: new RegExp(params.search, 'i') },
-                { codeClient: new RegExp(params.search, 'i') },
-                { produit: new RegExp(params.search, 'i') }
-			];
-		}
-
 		return filter;
 	}
     
@@ -71,12 +35,12 @@ class CommandeService {
 
 		return Promise.all([
 			db
-				.collection('commandeInsetion')
+				.collection('commandePreparation')
 				.find(filter)
 				.skip(offset)
 				.limit(limit)
 				.toArray(),
-			db.collection('commandeInsetion').countDocuments(filter),
+			db.collection('commandePreparation').countDocuments(filter),
 		]).then(
 			([commandes,commandesCount]) => {
 				const items = commandes.map(commande =>
@@ -97,45 +61,30 @@ class CommandeService {
 			item.id = item._id.toString();
 			delete item._id
 			
-			item.composants = this.getSortedComposantsWithUrls(item, domain);
-
+			item = this.getCommandeUrl(item, domain);
 		}
 
 		return item;
     }
     
-    getSortedComposantsWithUrls(item, domain) {
-		if (item.composants && item.composants.length > 0) {
-			return item.composants
-				.map(composant => {
-					composant= this.getCommandeUrl(domain, item.id, composant);
-					return composant;
-				})
-				
-		} else {
-			return item.composants;
-		}
-    }
-
-    getCommandeUrl(domain, commandeId, composant) {
-        composant.shema = url.resolve(
+    getCommandeUrl(item,domain) {
+        item.shema = url.resolve(
             domain,
-            `${settings.assetServer.composantUploadPath}/${commandeId}/${composant.shema}`
+            `${settings.assetServer.commandePreparationUploadPath}/${item.shema}`
         );
-        composant.image = url.resolve(
+        item.image = url.resolve(
             domain,
-            `${settings.assetServer.composantUploadPath}/${commandeId}/${composant.image}`
+            `${settings.assetServer.commandePreparationUploadPath}/${item.image}`
         );
-        return composant;
+        return item;
 
 	}
 
-    
     getSingleCommande(id) {
 		if (!ObjectID.isValid(id)) {
             return {status:false,message:"Invalid identifier"};
 		}
-		return this.getCommandes({ ids: id, limit: 1 }).then(
+		return this.getCommandes({ id: id, limit: 1 }).then(
 			commandes => (commandes.data.length > 0 ? commandes.data[0] : {})
 		);
     }
@@ -145,108 +94,120 @@ class CommandeService {
 		let commande = {
 			date_created: new Date(),
 			date_updated: null,
-			composants: [],
-
 		};
 
 		commande.ordreFabrication = parse.getString(data.ordreFabrication);
-		commande.produit = parse.getString(data.produit);
-		commande.codeClient = parse.getString(data.codeClient);
-		commande.quantite = parse.getNumberIfPositive(data.quantite) || 0;
-		commande.composant = parse.getString(data.composant) ;
-		commande.codeClientProduit = parse.getString(data.codeClientProduit);
+		commande.shema = parse.getString(data.shema);
+		commande.image = parse.getString(data.image);
+		commande.nbrComposant = parse.getNumberIfPositive(data.nbrComposant) || 0;
         commande.dateDebut = parse.getDateIfValid(data.dateDebut);
-        commande.post = parse.getString(data.post);
 
 		return commande
     }
     
-    addCommande(data) {
-		return this.getValidDocumentForInsert(data)
+    addCommande(req, res) {
+		let form = new formidable.IncomingForm();
+    
+        form.parse(req, async(err, fields, files) =>{
+			//console.log(files)
+
+            if(err){
+                res.send({ status: false, message: err.toString() });
+			}
+			
+			if(fields==null || !fields || Object.keys(fields).length ===0){
+                res.send({ status: false, message: "Tous les champs obligatoire"});
+			}
+			 
+			if(fields.ordreFabrication == null || fields.ordreFabrication === undefined){
+                res.send({ status: false, message: "Prdre de fabrication empty"});
+			}
+
+			if(fields.dateDebut == null || fields.dateDebut === undefined){
+                res.send({ status: false, message: "Date Debut empty"});
+			}
+			
+            if(files==null || !files || Object.keys(files).length ===0){
+                res.send({ status: false, message: "No file were uploaded"});
+            }
+
+            if(!Object.keys(files).includes("shema") || !Object.keys(files).includes("image")){
+                res.send({ status: false, message: "shema && image empty"});
+            }
+
+            if(files.shema&&files.shema.size == 0){
+                res.send({ status: false, message: "shema empty"});
+            }
+
+            if(files.shema&&files.shema.size == 0){
+                res.send({ status: false, message: "image empty"});
+            }
+
+			if(fields.nbrComposant == null || fields.nbrComposant === undefined){
+                res.send({ status: false, message: "Nombre de composant empty"});
+			}
+
+            //get url upload && create folder
+            const BaseAssetPath = `${settings.assetServer.localBasePath}`;
+            const dir = `${settings.assetServer.commandePreparationUploadPath}`;
+            const uploadDir = `${BaseAssetPath}/${dir}`
+            fse.ensureDirSync(uploadDir);
+         
+            //get name && path file
+                var image=files.image
+                var shema=files.shema
+            //correct file name
+                var image_name = utils.getCorrectFileName(image.name);
+                var image_path = `${uploadDir}/${image_name}`;
+                var shema_name = utils.getCorrectFileName(shema.name);
+                var shema_path = `${uploadDir}/${shema_name}`;
+
+            //upload files
+            fse.writeFile(image_path,image_path, function(err){ 
+                if(err)
+                res.send({ status: false, message: "upload error"});
+            }) 
+
+            fse.writeFile(shema_path,shema_path, function(err){ 
+                if(err)
+                res.send({ status: false, message: "upload error"});
+            }) 
+
+            //add BDD    
+			const filesData = {
+				shema:shema_name,
+                image :image_name
+			}
+			const data={...fields,...filesData}
+			return this.getValidDocumentForInsert(data)
 			.then(dataToInsert =>
-				db.collection('commandeInsetion').insertMany([dataToInsert])
+				db.collection('commandePreparation').insertMany([dataToInsert])
 			)
-			.then(res => this.getSingleCommande(res.ops[0]._id.toString()));
-	}
+			.then(async result =>{ 
+				if(result.insertedCount > 0) 
+				{
+					const commande =await this.getSingleCommande(result.ops[0]._id.toString())
+					res.send({status:true, data : commande, message :'Vous avez crée une nouvelle commande.'})
+				}
+				res.send({status:false, data : null, message :'ADD failed'})
+			});
+				
+       
+		});
 
-	async getValidDocumentForUpdate(data) {
-
-		if (Object.keys(data).length === 0) {
-            return {status:false,message:"Required fields are missing"};
-		}
-
-		let commande = {
-			date_updated: new Date()
-		};
-
-		if (data.ordreFabrication !== undefined) {
-            commande.ordreFabrication = parse.getString(data.ordreFabrication);
-		}
-
-		if (data.produit !== undefined) {
-            commande.produit = parse.getString(data.produit);
-		}
-
-		if (data.codeClient !== undefined) {
-            commande.codeClient = parse.getString(data.codeClient);
-		}
-
-        if (data.quantite !== undefined) {
-            commande.quantite = parse.getNumberIfPositive(data.quantite)
-        }
-
-        if (data.composant !== undefined) {
-            commande.composant = parse.getString(data.composant) ;
-        }
-        
-        if (data.codeClientProduit !== undefined) {
-            commande.codeClientProduit = parse.getString(data.codeClientProduit);
-        }
-
-        if (data.dateDebut !== undefined) {
-            commande.dateDebut = parse.getDateIfValid(data.dateDebut);
-        }
-        
-        if (data.post !== undefined) {
-            commande.post = parse.getString(data.post);
-        }
-
-		return commande
-    }
-    
-    updateCommande(id, data) {
-		if (!ObjectID.isValid(id)) {
-            return {status:false,message:"Invalid identifier"};
-		}
-		const commandeObjectID = new ObjectID(id);
-
-		return this.getValidDocumentForUpdate(data)
-			.then(dataToSet =>
-				db
-					.collection('commandeInsetion')
-					.updateOne({ _id: commandeObjectID }, { $set: dataToSet })
-			)
-			.then(res => (res.modifiedCount > 0 ? this.getSingleCommande(id) : null));
-    }
+	}  
     
     deleteCommande(commandeId) {
 		if (!ObjectID.isValid(commandeId)) {
 			return {status:false,message:"Invalid identifier"}
 		}
 		const commandeObjectID = new ObjectID(commandeId);
-		const domain = settings.assetServer.domain;
 
 		// 1. delete Commande
 		return db
-			.collection('commandeInsetion')
+			.collection('commandePreparation')
 			.deleteOne({ _id: commandeObjectID })
 			.then(deleteResponse => {
-				if (deleteResponse.deletedCount > 0) {
-					// 2. delete directory with composants
-					let deleteDir = settings.assetServer.composantUploadPath + '/' + commandeId
-					const dirPath = ResolveSystemPath(deleteDir);
-					fse.remove(dirPath);
-				}
 				return deleteResponse.deletedCount > 0;
 			});
 	}
