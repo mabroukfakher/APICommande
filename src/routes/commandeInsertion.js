@@ -11,10 +11,10 @@ class CommandesRoute {
 	registerRoutes() {
 		//commandes
 		this.router.get(
-			'/v1/commandes',
-			security.checkUserScope.bind(this, security.scope.CHEF),
-			this.getCommandes.bind(this)
-		);
+      "/v1/commandes_getall",
+      security.checkUserScope.bind(this, security.scope.CHEF),
+      this.getCommandes.bind(this)
+    );
 
 		this.router.post(
 			'/v1/commandes',
@@ -42,10 +42,10 @@ class CommandesRoute {
 		
 		//composants
 		this.router.post(
-			"/v1/commandes/:commandeId/composants",
-			security.checkUserScope.bind(this, security.scope.CHEF),
-			this.uploadComposant.bind(this)
-		);
+      "/v1/commandes/:commandeId/composants_Upload",
+      security.checkUserScope.bind(this, security.scope.CHEF),
+      this.uploadComposant.bind(this)
+    );
 
 		this.router.get(
 			'/v1/commandes/:commandeId/composants',
