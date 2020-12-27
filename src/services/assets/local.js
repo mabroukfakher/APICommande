@@ -150,7 +150,6 @@ class LocalService {
 			})
 			.on('file', async (field, file) => {
 				// every time a file has been uploaded successfully,
-				console.log("file",file)
 				if (file.name) {
 					await onFileUpload(file.name);
 

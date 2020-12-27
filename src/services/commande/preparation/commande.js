@@ -160,15 +160,20 @@ class CommandeService {
                 var image_name = utils.getCorrectFileName(image.name);
                 var image_path = `${uploadDir}/${image_name}`;
                 var shema_name = utils.getCorrectFileName(shema.name);
-                var shema_path = `${uploadDir}/${shema_name}`;
+				var shema_path = `${uploadDir}/${shema_name}`;
+
+				var oldPath_shema = files.shema.path; 
+				var rawData_shema = fse.readFileSync(oldPath_shema)
+				var oldPath_image = files.image.path; 
+				var rawData_image = fse.readFileSync(oldPath_image)
 
             //upload files
-            fse.writeFile(image_path,image_path, function(err){ 
+            fse.writeFile(image_path,rawData_image, function(err){ 
                 if(err)
                 res.send({ status: false, message: "upload error"});
             }) 
 
-            fse.writeFile(shema_path,shema_path, function(err){ 
+            fse.writeFile(shema_path,rawData_shema, function(err){ 
                 if(err)
                 res.send({ status: false, message: "upload error"});
             }) 
