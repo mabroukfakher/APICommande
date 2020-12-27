@@ -35,10 +35,10 @@ class CommandesRoute {
 		);
 
 		this.router.delete(
-			'/v1/commandes/:commandeId',
-			security.checkUserScope.bind(this, security.scope.CHEF),
-			this.deleteCommande.bind(this)
-		);
+      "/v1/commandes/:commandeId/delete",
+      security.checkUserScope.bind(this, security.scope.CHEF),
+      this.deleteCommande.bind(this)
+    );
 		
 		//composants
 		this.router.post(
