@@ -9,12 +9,6 @@ class WorksRoute {
 
     registerRoutes() {
 
-        this.router.get(
-            "/v1/works",
-            security.checkUserScope.bind(this, security.scope.CHEF),
-            this.getWorks.bind(this)
-        );
-
         this.router.post(
             "/v1/works/lanceWork",
             security.checkUserScope.bind(this, security.scope.CHEF),
@@ -22,16 +16,23 @@ class WorksRoute {
         );
 
         this.router.get(
+            "/v1/works/:customerId/getprofil",
+            this.getProfil.bind(this)
+        );
+        /******************************************* */
+        this.router.get(
+            "/v1/works",
+            security.checkUserScope.bind(this, security.scope.CHEF),
+            this.getWorks.bind(this)
+        );
+        
+        this.router.get(
             "/v1/works/:id/getSingleWork",
             security.checkUserScope.bind(this, security.scope.CHEF),
             this.getSingleWork.bind(this)
         );
 
-        this.router.get(
-            "/v1/works/:customerId/getprofil",
-            security.checkUserScope.bind(this, security.scope.CHEF),
-            this.getProfil.bind(this)
-        );
+ 
     
         this.router.put(
             "/v1/works/:id/updateWork",
@@ -47,7 +48,7 @@ class WorksRoute {
     
     }
     getProfil(req, res, next) {
-        WorksService.getProfil(req.params.customerId)
+        WorksService.getProfil(req.params.customerId,req.query)
             .then(data => {
                 res.send(data);
             })

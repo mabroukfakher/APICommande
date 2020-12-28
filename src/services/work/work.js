@@ -1,7 +1,8 @@
 import { ObjectID } from 'mongodb';
 import { db } from '../../lib/mongo';
 import parse from '../../lib/parse';
-
+import url from "url";
+import settings from "../../lib/settings";
 
 class WorkService {
 	
@@ -13,7 +14,7 @@ class WorkService {
 		if (id) {
 			filter._id = new ObjectID(id);
         }
-
+		
         const customerId = parse.getObjectIDIfValid(params.customerId);
 		if (customerId) {
 			filter.customerId = new ObjectID(customerId);
@@ -33,7 +34,7 @@ class WorkService {
 
 	getWorks(params = {}) {
         let {filter,fromTable} = this.getFilter(params);
-      
+   
 		return Promise.all([
 			db
                 .collection('works')
@@ -63,7 +64,7 @@ class WorkService {
 				.toArray(),
 		]).then(([works]) => {
 			var items = works.map(work =>
-				this.changeProperties(work)
+				this.changeProperties(work,fromTable)
 			);
 			
 			return items;
@@ -78,11 +79,11 @@ class WorkService {
 			items.length > 0 ? items[0] : {}
 		);
     }
-    getProfil(id) {
+    getProfil(id,data) {
 		if (!ObjectID.isValid(id)) {
             return {status:false,message:"Invalid identifier"};
 		}
-		return this.getWorks({ customerId: id }).then(items =>{
+		return this.getWorks({ customerId: id,...data }).then(items =>{
             if(items.length > 0) 
             return {status:true,data:items[0]}
             return{status:false,message:"No Commande"}
@@ -178,7 +179,9 @@ class WorkService {
 		return work;
 	}
 
-	changeProperties(work) {
+	changeProperties(work,fromTable) {
+		const domain = settings.assetServer.domain;
+
 		if (work) {
 			work.id = work._id.toString();
             delete work._id;
@@ -193,16 +196,67 @@ class WorkService {
             delete work.customer.role
             delete work.customer.password
             work.customer.id = work.customer._id.toString();
-            delete work.customer._id;
-            delete work.commande.date_created
-            delete work.commande.date_updated
-            work.commande.id = work.commande._id.toString();
-            delete work.commande._id;
+			delete work.customer._id;
+			if(work.commande !=undefined){
+				delete work.commande.date_created
+				delete work.commande.date_updated
+				work.commande.id = work.commande._id.toString();
+				delete work.commande._id;
+				
+				if(fromTable.typeCommande === "commandeInsetion")
+				{
+					work.commande.composants = this.getSortedComposantsInsertionWithUrls(work.commande, domain);
+				}else{
+					work.commande = this.getCommandePreparationUrl(work.commande, domain);
 
+				}
+			}
+
+
+			
 
 		}
 
 		return work;
+	}
+
+	getSortedComposantsInsertionWithUrls(item, domain) {
+		if (item.composants && item.composants.length > 0) {
+			return item.composants
+				.map(composant => {
+					composant= this.getCommandeInsertionUrl(domain, item.id, composant);
+					return composant;
+				})
+				
+		} else {
+			return item.composants;
+		}
+	}
+
+	getCommandeInsertionUrl(domain, commandeId, composant) {
+        composant.shema = url.resolve(
+            domain,
+            `${settings.assetServer.composantUploadPath}/${commandeId}/${composant.shema}`
+        );
+        composant.image = url.resolve(
+            domain,
+            `${settings.assetServer.composantUploadPath}/${commandeId}/${composant.image}`
+        );
+        return composant;
+
+	}
+
+	getCommandePreparationUrl(item,domain) {
+        item.shema = url.resolve(
+            domain,
+            `${settings.assetServer.commandePreparationUploadPath}/${item.shema}`
+        );
+        item.image = url.resolve(
+            domain,
+            `${settings.assetServer.commandePreparationUploadPath}/${item.image}`
+        );
+        return item;
+
 	}
 
 }
