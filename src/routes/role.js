@@ -12,11 +12,11 @@ class RolesRoute {
     this.router.get(
       "/v1/roles",
       security.checkUserScope.bind(this, security.scope.CHEF),
-      this.getTokens.bind(this)
+      this.getRoles.bind(this)
     );
   }
 
-  async getTokens(req, res, next) {
+  async getRoles(req, res, next) {
     try {
       const data = await RolesService.getRoles();
       return res.send(data);

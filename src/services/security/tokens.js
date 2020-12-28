@@ -20,6 +20,11 @@ class SecurityTokensService {
     if (matricule && matricule.length > 0) {
       filter.matricule = matricule;
     }
+    const role = parse.getString(params.role)
+    if (role && role.length > 0) {
+      const tabRole=[role]
+      filter.role ={ $in: tabRole }
+    }
 
     return db
       .collection("tokens")
