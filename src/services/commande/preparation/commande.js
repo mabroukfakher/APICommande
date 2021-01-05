@@ -100,7 +100,11 @@ class CommandeService {
 		commande.shema = parse.getString(data.shema);
 		commande.image = parse.getString(data.image);
 		commande.nbrComposant = parse.getNumberIfPositive(data.nbrComposant) || 0;
-        commande.dateDebut = parse.getDateIfValid(data.dateDebut);
+		commande.dateDebut = parse.getDateIfValid(data.dateDebut);
+		commande.ref = parse.getString(data.ref)
+    commande.post = parse.getString(data.post)
+
+		
 
 		return commande
     }
@@ -126,6 +130,9 @@ class CommandeService {
 			if(fields.dateDebut == null || fields.dateDebut === undefined){
                 res.send({ status: false, message: "Date Debut empty"});
 			}
+				if (fields.ref == null || fields.ref === undefined) {
+          res.send({ status: false, message: "ref empty" })
+        }
 			
             if(files==null || !files || Object.keys(files).length ===0){
                 res.send({ status: false, message: "No file were uploaded"});
