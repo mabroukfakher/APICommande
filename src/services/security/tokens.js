@@ -176,8 +176,9 @@ class SecurityTokensService {
 
       const payload = {
         role: token.role,
-        jti: token.id
-      };
+        jti: token.id,
+        name: token.name,
+      }
 
       if (token.matricule && token.matricule.length > 0) {
         payload.matricule = token.matricule;
