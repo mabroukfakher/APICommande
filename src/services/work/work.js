@@ -33,43 +33,40 @@ class WorkService {
 	}
 
 	getWorks(params = {}) {
-        let {filter,fromTable} = this.getFilter(params);
-   
-		return Promise.all([
-			db
-                .collection('works')
-                .aggregate([
-                    {
-                        $match: filter
-                    },
-                    {
-                        $lookup: {
-                            from: 'tokens',
-                            localField: 'customerId',
-                            foreignField: '_id',
-                            as: 'customer'
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: fromTable.typeCommande,
-                            localField: 'commandeId',
-                            foreignField: '_id',
-                            as: 'commande'
-                        }
-                    },
-                    { $sort: { date_created: -1 } },
-            
-                ])
-				.toArray(),
-		]).then(([works]) => {
-			var items = works.map(work =>
-				this.changeProperties(work,fromTable)
-			);
-			
-			return items;
-		});
-	}
+    let { filter, fromTable } = this.getFilter(params)
+
+    return Promise.all([
+      db
+        .collection("works")
+        .aggregate([
+          {
+            $match: filter,
+          },
+          {
+            $lookup: {
+              from: "tokens",
+              localField: "customerId",
+              foreignField: "_id",
+              as: "customer",
+            },
+          },
+          {
+            $lookup: {
+              from: fromTable.typeCommande,
+              localField: "commandeId",
+              foreignField: "_id",
+              as: "commande",
+            },
+          },
+          { $sort: { date_created: -1 } },
+        ])
+        .toArray(),
+    ]).then(([works]) => {
+      var items = works.map((work) => this.changeProperties(work, fromTable))
+
+      return items
+    })
+  }
 
 	getSingleWork(id) {
 		if (!ObjectID.isValid(id)) {
