@@ -151,6 +151,7 @@ class WorkService {
 		let work = {
 			date_created: new Date(),
 			date_updated: null,
+			etat: "play"
 		};
 
 		work.customerId = parse.getObjectIDIfValid(data.customerId);
@@ -174,6 +175,10 @@ class WorkService {
 		
 		if (data.commandeId !== undefined) {
 			work.commandeId = parse.getObjectIDIfValid(data.commandeId);
+		}
+
+		if (data.etat !== undefined) {
+			work.etat = parse.getString(data.etat);
 		}
 
 		return work;

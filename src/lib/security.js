@@ -9,7 +9,8 @@ const PATHS_WITH_OPEN_ACCESS = ["/api/v1/authorize"];
 const scope = {
   CHEF: "chef",
   PREPARATION: "preparation",
-  Insertion: "insertion"
+  Insertion: "insertion",
+  Mixte:["preparation","insertion"]
 };
 
 const checkUserScope = (requiredScope, req, res, next) => {
@@ -23,9 +24,10 @@ const checkUserScope = (requiredScope, req, res, next) => {
     user &&
     user.role &&
     user.role.length > 0 &&
-    (user.role.includes(scope.CHEF) ||
+    (user.role.includes(scope.CHEF) || (requiredScope===scope.Mixte) ||
       user.role.includes(requiredScope))
     ) {
+      req.user = user;
       next();
     } else {
       res.status(403).send({ status: false, message: "Accès invalide" });
@@ -38,11 +40,11 @@ const checkUserScope = (requiredScope, req, res, next) => {
 
 const applyMiddleware = app => {
   if (DEVELOPER_MODE === false) {
-    app.use(
-      expressJwt({
-        secret: settings.jwtSecretKey,
-      }).unless({ path: PATHS_WITH_OPEN_ACCESS })
-    );
+    // app.use(
+    //   expressJwt({
+    //     secret: settings.jwtSecretKey,
+    //   }).unless({ path: PATHS_WITH_OPEN_ACCESS })
+    // );
   }
 };
 

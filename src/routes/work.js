@@ -17,6 +17,7 @@ class WorksRoute {
 
         this.router.get(
             "/v1/works/:customerId/getprofil",
+            security.checkUserScope.bind(this, security.scope.Mixte),
             this.getProfil.bind(this)
         );
         /******************************************* */

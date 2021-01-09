@@ -109,42 +109,41 @@ class CommandeService {
 		let form = new formidable.IncomingForm();
     
         form.parse(req, async(err, fields, files) =>{
-			//console.log(files)
-
-            if(err){
-                res.send({ status: false, message: err.toString() });
-			}
+			
+	        // if(err){
+            //     res.send({ status: false, message: err.toString() });
+			// }
 			
 			if(fields==null || !fields || Object.keys(fields).length ===0){
-                res.send({ status: false, message: "Tous les champs obligatoire"});
+                return res.send({ status: false, message: "Tous les champs obligatoire"});
 			}
 			 
 			if(fields.ordreFabrication == null || fields.ordreFabrication === undefined){
-                res.send({ status: false, message: "Prdre de fabrication empty"});
+                return res.send({ status: false, message: "Prdre de fabrication empty"});
 			}
 
 			if(fields.dateDebut == null || fields.dateDebut === undefined){
-                res.send({ status: false, message: "Date Debut empty"});
+                return res.send({ status: false, message: "Date Debut empty"});
 			}
 			
             if(files==null || !files || Object.keys(files).length ===0){
-                res.send({ status: false, message: "No file were uploaded"});
+                return res.send({ status: false, message: "No file were uploaded"});
             }
 
             if(!Object.keys(files).includes("shema") || !Object.keys(files).includes("image")){
-                res.send({ status: false, message: "shema && image empty"});
+                return res.send({ status: false, message: "shema && image empty"});
             }
 
             if(files.shema&&files.shema.size == 0){
-                res.send({ status: false, message: "shema empty"});
+                return res.send({ status: false, message: "shema empty"});
             }
 
             if(files.shema&&files.shema.size == 0){
-                res.send({ status: false, message: "image empty"});
+				return res.send({ status: false, message: "image empty"});
             }
 
 			if(fields.nbrComposant == null || fields.nbrComposant === undefined){
-                res.send({ status: false, message: "Nombre de composant empty"});
+				return res.send({ status: false, message: "Nombre de composant empty"});
 			}
 
             //get url upload && create folder
@@ -170,12 +169,12 @@ class CommandeService {
             //upload files
             fse.writeFile(image_path,rawData_image, function(err){ 
                 if(err)
-                res.send({ status: false, message: "upload error"});
+				return res.send({ status: false, message: "upload error"});
             }) 
 
             fse.writeFile(shema_path,rawData_shema, function(err){ 
                 if(err)
-                res.send({ status: false, message: "upload error"});
+				return res.send({ status: false, message: "upload error"});
             }) 
 
             //add BDD    
@@ -192,9 +191,9 @@ class CommandeService {
 				if(result.insertedCount > 0) 
 				{
 					const commande =await this.getSingleCommande(result.ops[0]._id.toString())
-					res.send({status:true, data : commande, message :'Vous avez crée une nouvelle commande.'})
+					return res.send({status:true, data : commande, message :'Vous avez crée une nouvelle commande.'})
 				}
-				res.send({status:false, data : null, message :'ADD failed'})
+				return res.send({status:false, data : null, message :'ADD failed'})
 			});
 				
        
