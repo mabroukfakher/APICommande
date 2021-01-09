@@ -33,43 +33,40 @@ class WorkService {
 	}
 
 	getWorks(params = {}) {
-        let {filter,fromTable} = this.getFilter(params);
-   
-		return Promise.all([
-			db
-                .collection('works')
-                .aggregate([
-                    {
-                        $match: filter
-                    },
-                    {
-                        $lookup: {
-                            from: 'tokens',
-                            localField: 'customerId',
-                            foreignField: '_id',
-                            as: 'customer'
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: fromTable.typeCommande,
-                            localField: 'commandeId',
-                            foreignField: '_id',
-                            as: 'commande'
-                        }
-                    },
-                    { $sort: { date_created: -1 } },
-            
-                ])
-				.toArray(),
-		]).then(([works]) => {
-			var items = works.map(work =>
-				this.changeProperties(work,fromTable)
-			);
-			
-			return items;
-		});
-	}
+    let { filter, fromTable } = this.getFilter(params)
+
+    return Promise.all([
+      db
+        .collection("works")
+        .aggregate([
+          {
+            $match: filter,
+          },
+          {
+            $lookup: {
+              from: "tokens",
+              localField: "customerId",
+              foreignField: "_id",
+              as: "customer",
+            },
+          },
+          {
+            $lookup: {
+              from: fromTable.typeCommande,
+              localField: "commandeId",
+              foreignField: "_id",
+              as: "commande",
+            },
+          },
+          { $sort: { date_created: -1 } },
+        ])
+        .toArray(),
+    ]).then(([works]) => {
+      var items = works.map((work) => this.changeProperties(work, fromTable))
+
+      return items
+    })
+  }
 
 	getSingleWork(id) {
 		if (!ObjectID.isValid(id)) {
@@ -185,45 +182,42 @@ class WorkService {
 	}
 
 	changeProperties(work,fromTable) {
-		const domain = settings.assetServer.domain;
+    const domain = settings.assetServer.domain
 
-		if (work) {
-			work.id = work._id.toString();
-            delete work._id;
-            delete work.customerId
-            delete work.commandeId
-            delete work.date_created
-            delete work.date_updated
-            work.customer=work.customer[0]
-            work.commande=work.commande[0]
-            delete work.customer.date_created
-            delete work.customer.date_updated
-            delete work.customer.role
-            delete work.customer.password
-            work.customer.id = work.customer._id.toString();
-			delete work.customer._id;
-			if(work.commande !=undefined){
-				delete work.commande.date_created
-				delete work.commande.date_updated
-				work.commande.id = work.commande._id.toString();
-				delete work.commande._id;
-				
-				if(fromTable.typeCommande === "commandeInsetion")
-				{
-					work.commande.composants = this.getSortedComposantsInsertionWithUrls(work.commande, domain);
-				}else{
-					work.commande = this.getCommandePreparationUrl(work.commande, domain);
+    if (work) {
+      work.id = work._id.toString()
+      delete work._id
+      delete work.customerId
+      delete work.commandeId
+      delete work.date_created
+      delete work.date_updated
+      work.customer = work.customer[0]
+      work.commande = work.commande[0]
+      delete work.customer.date_created
+      delete work.customer.date_updated
+      delete work.customer.role
+      delete work.customer.password
+      work.customer.id = work.customer._id.toString()
+      delete work.customer._id
+      if (work.commande != undefined) {
+        delete work.commande.date_created
+        delete work.commande.date_updated
+        work.commande.id = work.commande._id.toString()
+        delete work.commande._id
 
-				}
-			}
+        if (fromTable.typeCommande === "commandeInsetion") {
+          work.commande.composants = this.getSortedComposantsInsertionWithUrls(
+            work.commande,
+            domain
+          )
+        } else {
+          work.commande = this.getCommandePreparationUrl(work.commande, domain)
+        }
+      }
+    }
 
-
-			
-
-		}
-
-		return work;
-	}
+    return work
+  }
 
 	getSortedComposantsInsertionWithUrls(item, domain) {
 		if (item.composants && item.composants.length > 0) {
