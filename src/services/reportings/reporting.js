@@ -39,7 +39,9 @@ class ReportingService {
                                     nameCustomer:"$customer.name",
                                     matCustomer:"$customer.matricule",
                                     etat:"$etat",
-                                    commande:"$commande"
+                                    commande:"$commande",
+                                    date_updated:"$date_updated",
+                                    date_created:"$date_created"
                                 }
                             }
                         }
@@ -101,8 +103,16 @@ class ReportingService {
                      i--
                 }
             }
-			
-			return items.length>0 ? items[0] :{};
+			if(items.length>0){
+                var max = items[0]
+                for (var i=1; i<items.length;i++){
+                    if(items[i].date_updated>max.date_updated){
+                        max = items[i]
+                    }
+                }
+                return max
+            }
+			return {};
 		});
     }
 
@@ -134,13 +144,32 @@ class ReportingService {
 		
             work.post = work._id[0]
             delete work._id
-            if(work.stat.length>0){
-
-                work.etat= work.stat[0].etat
-                work.matricule= work.stat[0].matCustomer[0]
-                work.name= work.stat[0].nameCustomer[0]
-                work.commande=work.stat[0].commande.length
+            work.stat.map(stats=>{
+                stats.etat= stats.etat
+                stats.matricule= stats.matCustomer[0]
+                stats.name= stats.nameCustomer[0]
+                delete stats.nameCustomer
+                delete stats.matCustomer
+                stats.commande=stats.commande.length
+                stats.date_created= stats.date_created
+                stats.date_updated= stats.date_updated
+            })
+            var max = work.stat[0]
+            for (var i=1; i<work.stat.length;i++){
+                if(work.stat[i].date_updated>max.date_updated){
+                    max = work.stat[i]
+                }
             }
+            work.stat=max
+            // if(work.stat.length>0){
+
+                work.etat= work.stat.etat
+                work.matricule= work.stat.matricule
+                work.name= work.stat.name
+                work.commande=work.stat.commande
+                work.date_created= work.stat.date_created
+                work.date_updated= work.stat.date_updated
+            // }
             
             delete work.stat
 
