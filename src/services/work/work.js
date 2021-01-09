@@ -58,7 +58,7 @@ class WorkService {
               as: "commande",
             },
           },
-          { $sort: { date_created: -1 } },
+          { $sort: { date_updated: -1 } },
         ])
         .toArray(),
     ]).then(([works]) => {
@@ -82,7 +82,7 @@ class WorkService {
 		}
 		return this.getWorks({ customerId: id,...data }).then(items =>{
             if(items.length > 0) 
-            return {status:true,data:items[0]}
+              return {status:true,data:items[0]}
             return{status:false,message:"No Commande"}
 		});
     }
