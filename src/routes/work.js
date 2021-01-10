@@ -37,7 +37,7 @@ class WorksRoute {
     
         this.router.put(
             "/v1/works/:id/updateWork",
-            security.checkUserScope.bind(this, security.scope.CHEF),
+            security.checkUserScope.bind(this, security.scope.Mixte),
             this.updateWork.bind(this)
         );
 

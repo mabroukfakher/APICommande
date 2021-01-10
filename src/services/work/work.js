@@ -148,7 +148,7 @@ class WorkService {
 		let work = {
 			date_created: new Date(),
 			date_updated: new Date(),
-			etat: "play"
+			etat: "En cours de preparation"
 		};
 
 		work.customerId = parse.getObjectIDIfValid(data.customerId);

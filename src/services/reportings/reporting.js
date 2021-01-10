@@ -130,6 +130,8 @@ class ReportingService {
                 work.name= work.customer[0].name
                
             }
+            work.ordreFabrication= work.commande.length>0 ?work.commande[0].ordreFabrication : ""
+
             work.commande=work.commande.length
             delete work.customer
 
@@ -150,6 +152,7 @@ class ReportingService {
                 stats.name= stats.nameCustomer[0]
                 delete stats.nameCustomer
                 delete stats.matCustomer
+                stats.ordreFabrication=stats.commande.length>0 ?stats.commande[0].ordreFabrication : ""
                 stats.commande=stats.commande.length
                 stats.date_created= stats.date_created
                 stats.date_updated= stats.date_updated
@@ -169,6 +172,7 @@ class ReportingService {
                 work.commande=work.stat.commande
                 work.date_created= work.stat.date_created
                 work.date_updated= work.stat.date_updated
+                work.ordreFabrication=work.stat.ordreFabrication
             // }
             
             delete work.stat
